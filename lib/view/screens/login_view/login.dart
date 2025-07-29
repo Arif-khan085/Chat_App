@@ -1,8 +1,10 @@
 import 'package:chat_app/resources/colors/app_colors.dart';
 import 'package:chat_app/resources/roundbutton.dart';
+import 'package:chat_app/view/screens/signup_view/signup.dart';
 import 'package:chat_app/view/widget/passwordtextformfield/PasswordTextFormField.dart';
 
 import 'package:flutter/material.dart';
+
 
 import '../../widget/emailtextformfield/EmailTextFormField.dart';
 
@@ -15,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isHidden = true;
+  bool _isRemember = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -32,9 +35,19 @@ class _LoginScreenState extends State<LoginScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: 20),
+          Text(
+            'Login',
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          Text(
+            textAlign: TextAlign.center,
+            'Enter Your Email And Password to securely Access your Account and manage your services',
+          ),
+          SizedBox(height: 20),
           CustomTextFieldEmail(
             hintText: 'Enter Email',
-
             labelText: 'Email',
             prefixIcon: Icon(Icons.email),
             controller: emailController,
@@ -57,20 +70,53 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           SizedBox(height: 20),
           RoundButton(
-            title: 'Login',
+            title: 'Sign In',
             color: AppColors.primaryColors,
             textColor: AppColors.accent,
             onTap: () {},
           ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Checkbox(
+                    value: _isRemember,
+                    onChanged: (bool? _newValue) {
+                      setState(() {
+                        _isRemember = _newValue!;
+                      });
+                    },
+                  ),
+                  Text('Remember Me', style: TextStyle(fontSize: 18)),
+                ],
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text('Forget Password', style: TextStyle(fontSize: 18)),
+              ),
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Do not have and account?', style: TextStyle(fontSize: 20)),
+              Text('Do not have an account?', style: TextStyle(fontSize: 20)),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignUpScreen()),
+                  );
+                },
                 child: Text('Sign Up', style: TextStyle(fontSize: 20)),
               ),
             ],
+          ),
+          SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(right: 16, left: 16),
+            child: Divider(thickness: 2),
           ),
         ],
       ),
