@@ -1,5 +1,6 @@
 import 'package:chat_app/resources/colors/app_colors.dart';
 import 'package:chat_app/resources/roundbutton.dart';
+import 'package:chat_app/services/auth_services.dart';
 import 'package:chat_app/view/screens/signup_view/signup.dart';
 import 'package:chat_app/view/widget/passwordtextformfield/PasswordTextFormField.dart';
 
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  bool isLoading = false;
   @override
   void dispose() {
     emailController.dispose();
@@ -73,7 +74,28 @@ class _LoginScreenState extends State<LoginScreen> {
             title: 'Sign In',
             color: AppColors.primaryColors,
             textColor: AppColors.accent,
-            onTap: () {},
+            onTap: () {
+              if(emailController.text.isEmpty&&passwordController.text.isEmpty){
+                setState(() {
+                  isLoading=true;
+                });
+                login(emailController.text, passwordController.text).then((user){
+                  if(user  != null){
+                    print('Login Successfully');
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }else{
+                    print('Login failed');
+                    setState(() {
+                      isLoading=false;
+                    });
+                  }
+                });
+              }else{
+                print('please fill form correctly');
+              }
+            },
           ),
 
           Row(
