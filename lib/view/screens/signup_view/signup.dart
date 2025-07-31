@@ -1,6 +1,7 @@
 import 'package:chat_app/resources/colors/app_colors.dart';
 import 'package:chat_app/resources/roundbutton.dart';
 import 'package:chat_app/services/auth_services.dart';
+import 'package:chat_app/view/screens/home_screen/homescreen.dart';
 import 'package:chat_app/view/screens/signup_view/signup.dart';
 import 'package:chat_app/view/widget/nametextformfield/NameTextFormField.dart';
 import 'package:chat_app/view/widget/passwordtextformfield/PasswordTextFormField.dart';
@@ -19,13 +20,16 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   bool _isHidden = true;
+  bool isHidden =true;
   bool _isRemember = false;
+
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmController = TextEditingController();
   bool isLoading =false;
+  final GlobalKey<FormState>_formkey=GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -40,116 +44,147 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              'Create Account',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Text(
-              textAlign: TextAlign.center,
-              'Create a new Account to get started and enjoy seamless access to our features',
-            ),
-            SizedBox(height: 20),
-            CustomTextFieldName(hintText: 'Enter name ', controller: nameController, prefixIcon: Icon(Icons.person), labelText: 'Name'),
-            SizedBox(height: 20),
-            CustomTextFieldEmail(
-              hintText: 'Enter Email',
-              labelText: 'Email',
-              prefixIcon: Icon(Icons.email),
-              controller: emailController,
-            ),
-            SizedBox(height: 20),
-            CustomTextFieldPassword(
-              obscureText: _isHidden,
-              hintText: 'Enter Password',
-              controller: passwordController,
-              prefixIcon: Icon(Icons.lock),
-              suffixIcon: IconButton(
-                icon: Icon(_isHidden ? Icons.visibility_off : Icons.visibility),
-                onPressed: () {
-                  setState(() {
-                    _isHidden = !_isHidden;
-                  });
-                },
+        child: Form(
+          key: _formkey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Text(
+                'Create Account',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
-              labelText: 'Password',
-            ),
-            SizedBox(height: 20),
-            CustomTextFieldPassword(
-              obscureText: _isHidden,
-              hintText: 'Enter Confirm Password',
-              controller: confirmController,
-              prefixIcon: Icon(Icons.lock),
-              suffixIcon: IconButton(
-                icon: Icon(_isHidden ? Icons.visibility_off : Icons.visibility),
-                onPressed: () {
-                  setState(() {
-                    _isHidden = !_isHidden;
-                  });
-                },
+              SizedBox(height: 20),
+              Text(
+                textAlign: TextAlign.center,
+                'Create a new Account to get started and enjoy seamless access to our features',
               ),
-              labelText: 'Confirm Password',
-            ),
-            SizedBox(height: 20,),
-            isLoading?Center(child: CircularProgressIndicator()):RoundButton(
-            
-              title: 'Sign Up',
-              color: AppColors.primaryColors,
-              textColor: AppColors.accent,
-              onTap: () {
-            
-                if(nameController.text.isEmpty && emailController.text.isEmpty && passwordController.text.isEmpty && confirmController.text.isEmpty){
-            
-                  setState(() {
-                    isLoading =true;
-                  });
-                  createAccount(nameController.text, emailController.text, passwordController.text, confirmController.text).then((user){
-                    if(user!=null){
-                      setState(() {
-                        isLoading =true;
-                      });
-                      print('Login Successfully');
-                    }else{
-                      print('Please enter fields');
-                      setState(() {
-                        isLoading = false;
-                      });
-                    }
-                  });
-                }else{
-                  print('Please Enter Fields');
-                }
-              },
-            ),
-            
-            
-            SizedBox(height: 20,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Already have an account?', style: TextStyle(fontSize: 20)),
-                TextButton(
+              SizedBox(height: 20),
+              CustomTextFieldName(hintText: 'Enter name ', controller: nameController, prefixIcon: Icon(Icons.person), labelText: 'Name'),
+              SizedBox(height: 20),
+              CustomTextFieldEmail(
+                validator: (value){
+                  if(value==null||value.isEmpty){
+                    return 'Email is required';
+                  }else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)){
+                    return 'Enter valid Email';
+                  }
+                  return null;
+                },
+                hintText: 'Enter Email',
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email),
+                controller: emailController,
+              ),
+              SizedBox(height: 20),
+              CustomTextFieldPassword(
+                validator: (value){
+                  if(value==null||value.isEmpty){
+                    return 'Password is required';
+                  }else if(value.length<6){
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+                obscureText: _isHidden,
+                hintText: 'Enter Password',
+                controller: passwordController,
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon: Icon(_isHidden ? Icons.visibility_off : Icons.visibility),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                    setState(() {
+                      _isHidden = !_isHidden;
+                    });
                   },
-                  child: Text('Sign in', style: TextStyle(fontSize: 20)),
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.only(right: 16, left: 16),
-              child: Divider(thickness: 2),
-            ),
-          ],
+                labelText: 'Password',
+              ),
+              SizedBox(height: 20),
+              CustomTextFieldPassword(
+                validator: (value){
+                  if(value==null||value.isEmpty){
+                    return 'Password is required';
+                  }else if(value.length<6){
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+                obscureText: isHidden,
+                hintText: 'Enter Confirm Password',
+                controller: confirmController,
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon: Icon(isHidden ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      isHidden = !isHidden;
+                    });
+                  },
+                ),
+                labelText: 'Confirm Password',
+              ),
+              SizedBox(height: 20,),
+              isLoading?Center(child: CircularProgressIndicator()):RoundButton(
+                title: 'Sign Up',
+                color: AppColors.primaryColors,
+                textColor: AppColors.accent,
+                onTap: () {
+
+                  if(_formkey.currentState!.validate()){
+
+                    setState(() {
+                      isLoading =true;
+                    });
+                    createAccount(nameController.text, emailController.text, passwordController.text, confirmController.text).then((user){
+                      if(user!=null){
+                        setState(() {
+                          isLoading =true;
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Homescreen()), // or any other screen
+                        );
+
+                        print('Login Successfully');
+                      }else{
+                        print('Please enter fields');
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    });
+                  }else{
+                    print('Please Enter Fields');
+                  }
+                },
+              ),
+
+
+              SizedBox(height: 20,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Already have an account?', style: TextStyle(fontSize: 20)),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: Text('Sign in', style: TextStyle(fontSize: 20)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(right: 16, left: 16),
+                child: Divider(thickness: 2),
+              ),
+            ],
+          ),
         ),
       ),
     );
