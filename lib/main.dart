@@ -1,3 +1,4 @@
+import 'package:chat_app/services/auth_userin_services.dart';
 import 'package:chat_app/view/screens/login_view/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: Authenticate(),
 
     );
   }
