@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Create Account
@@ -14,7 +15,13 @@ Future<User?> createAccount(
       email: email,
       password: password,
     )).user;
+
     if (user != null) {
+      await user.updateDisplayName(name);
+      await user.reload();
+      final updatedUser = _auth.currentUser;
+
+      await saveUser(updatedUser!,name: name);
       print('Account Created successfully');
       return user;
     } else {
@@ -58,4 +65,27 @@ Future logout() async {
   } catch (e) {
     print(e);
   }
+
 }
+
+Future<void>  saveUser(User user, {String? name})async {
+  //to make a collection in firestore
+  final ref = FirebaseFirestore.instance.collection("User").doc(user.uid);
+
+  final snapshot = await ref.get();
+  if(!snapshot.exists){
+    //naming
+    final fallName = name ??
+  user.displayName?.trim() ??
+  user.email?.split("@").first ??
+  "User_${user.uid.substring(0, 5)}";
+
+    await ref.set({
+      "uid" : user.uid,
+      "name" : fallName,
+      "email" : user.email ?? "no email",
+      "createdAt" : FieldValue.serverTimestamp(),
+    });
+  }
+}
+
